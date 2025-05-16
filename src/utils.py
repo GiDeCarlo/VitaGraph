@@ -708,7 +708,7 @@ def extract_largest_connected_component(tsv_file, output_file, debug=True):
     return res
 
 # Utils for model training 
-def load_data(edge_index_path, features_paths_per_type, verbose=True):
+def load_data(edge_index_path, features_paths_per_type, quiet=True):
 
     edge_ind = pd.read_csv(edge_index_path, sep='\t', dtype=str)
    
@@ -728,7 +728,7 @@ def load_data(edge_index_path, features_paths_per_type, verbose=True):
     triplets_count = len(edge_ind)
     interaction_types_count = len(edge_ind.interaction.unique())
 
-    if verbose:
+    if not quiet:
         print(colored(f'[loaded edge index] triplets count: {triplets_count} interaction types count: {interaction_types_count}', 'green'))
 
     return edge_ind, node_features
@@ -764,7 +764,7 @@ def entities2id_offset(edge_index, node_features_per_type, quiet=False):
         else:
             all_nodes_per_type[x.split("::")[0]].append(x)
     
-    if quiet:
+    if not quiet:
         for node_type, nodes in all_nodes_per_type.items():
             print(colored(f'    [{node_type}] count: {len(nodes)}', 'green'))
 
@@ -865,11 +865,11 @@ def negative_sampling(target_triplets, negative_rate=1):
     samples = torch.cat([torch.tensor(target_triplets), neg_samples], dim=0)
     return samples, labels
 
-def triple_sampling(target_triplet, val_size, test_size, quiet=True):
+def triple_sampling(target_triplet, val_size, test_size, quiet=True, seed=42):
     val_len = len(target_triplet) * val_size
     # split the data into training, testing, and validation 
-    temp_data, test_data = train_test_split(target_triplet, test_size=test_size, random_state=42, shuffle=True)
-    train_data, val_data = train_test_split(temp_data, test_size=(val_len / len(temp_data)), random_state=42, shuffle=True)
+    temp_data, test_data = train_test_split(target_triplet, test_size=test_size, random_state=seed, shuffle=True)
+    train_data, val_data = train_test_split(temp_data, test_size=(val_len / len(temp_data)), random_state=seed, shuffle=True)
     # print the shapes of the resulting sets
     if not quiet:
         print(f"Total number of target edges: {len(target_triplet)}")

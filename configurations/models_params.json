@@ -104,8 +104,8 @@
     "drkg":{
       "rgcn":{
         "conv_layer_num":1,
-        "layer_0":10,
-        "layer_1":15,
+        "layer_0":15,
+        "layer_1":10,
         "mlp_out_layer":50,
         "learning_rate":0.01,
         "num_bases":16,
@@ -179,12 +179,12 @@
         "regularization":0.001
       },
       "rgat": {
-        "conv_layer_num":2,
+        "conv_layer_num":1,
         "layer_0":10,
-        "layer_1":10,
-        "mlp_out_layer":20,
+        "layer_1":5,
+        "mlp_out_layer":40,
         "learning_rate":0.01,
-        "num_bases":8,
+        "num_bases":16,
         "grad_norm":1,
         "regularization":0.01
       },
@@ -248,11 +248,11 @@
       },
       "rgat": {
         "conv_layer_num":1,
-        "layer_0":15,
-        "layer_1":10,
-        "mlp_out_layer":16,
+        "layer_0":10,
+        "layer_1":5,
+        "mlp_out_layer":40,
         "learning_rate":0.01,
-        "num_bases":4,
+        "num_bases":16,
         "grad_norm":1,
         "regularization":0.01
       },
@@ -280,14 +280,14 @@
         "regularization":0.01
       },
       "rgat": {
-        "conv_layer_num":2,
+        "conv_layer_num":1,
         "layer_0":20,
-        "layer_1":5,
-        "mlp_out_layer":10,
-        "learning_rate":0.001,
+        "layer_1":10,
+        "mlp_out_layer":30,
+        "learning_rate":0.01,
         "num_bases":16,
         "grad_norm":1,
-        "regularization":0.001
+        "regularization":0.01
       },
       "compgcn": {
         "conv_layer_num":1,

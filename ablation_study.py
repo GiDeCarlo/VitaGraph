@@ -35,7 +35,7 @@ models_params_path = './configurations/models_params.json'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def get_dataset(dataset_version, task, validation_size, test_size, quiet):  
+def get_dataset(dataset_version, task, validation_size, test_size, quiet, seed):  
 
   features_paths = {}
   if dataset_version == 'vitagraph':
@@ -71,7 +71,8 @@ def get_dataset(dataset_version, task, validation_size, test_size, quiet):
                                                                 target_triplets.loc[:,["head","interaction","tail"]].values, 
                                                                 validation_size, 
                                                                 test_size, 
-                                                                quiet
+                                                                quiet,
+                                                                seed
                                                               )
 
   non_target_triplets = non_target_triplets.loc[:,["head","interaction","tail"]].values
@@ -213,7 +214,7 @@ def main(model_name, dataset_version, task, runs, epochs, patience, validation_s
   for i in range(runs):
     run_model_save_path = model_save_path.replace(".pt", f"_run{i}.pt")
     random_seed = BASE_SEED + i
-    set_seed(random_seed)
+    # set_seed(random_seed)
     if not quiet: print(f'[i] Using random seed {random_seed}')
     
     # Get dataset
@@ -221,7 +222,7 @@ def main(model_name, dataset_version, task, runs, epochs, patience, validation_s
     start_time_dataset = time.time()
     in_channels_dict, num_nodes_per_type, num_entities, num_relations, \
     train_triplets, train_index, flattened_features_per_type, val_triplets, \
-    train_val_triplets, test_triplets, train_val_test_triplets = get_dataset(dataset_version, task, validation_size, test_size, quiet)
+    train_val_triplets, test_triplets, train_val_test_triplets = get_dataset(dataset_version, task, validation_size, test_size, quiet, random_seed)
     end_time_dataset = round(time.time() - start_time_dataset, 2)
     if not quiet: print(f'ok ({end_time_dataset} seconds)')
     
@@ -351,7 +352,7 @@ if __name__ == '__main__':
   parser.add_argument('-m', '--model', type=str, default='rgcn', choices=['rgcn', 'rgat', 'compgcn'], help='Model to use for the ablation study.')
   parser.add_argument('-r', '--runs', type=int, default=10, help='Number of runs for the ablation study.')
   parser.add_argument('-e', '--epochs', type=int, default=400, help='Number of epochs for the ablation study.')
-  parser.add_argument('-p', '--patience', type=int, default=100, help='Patience trigger.')
+  parser.add_argument('-p', '--patience', type=int, default=200, help='Patience trigger.')
   parser.add_argument('--validation_size', type=float, default=0.1, help='Validation size for the ablation study.')
   parser.add_argument('--test_size', type=float, default=0.2, help='Test size for the ablation study.')
   parser.add_argument('--quiet', action='store_true', help='If set, the ablation study will print debug output.')
