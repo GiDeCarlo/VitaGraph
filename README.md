@@ -1,6 +1,6 @@
 # VitaGraph
 
-This repository contains the codebase and resources for the paper **Building a Knowledge Graph for Biology-Relevant Learning Tasks**.
+This repository contains the codebase and resources for the paper **VitaGraph: Building a Knowledge Graph for Biologically Relevant Learning Tasks**.
 
 ## 📦 VitaGraph
 
