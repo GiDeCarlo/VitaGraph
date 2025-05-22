@@ -26,10 +26,10 @@ This will:
 
 In ablation_study.py is present the code used to execute the ablation study on all the possible datasets versions, tasks, and models.
 
-## 📄 Paper
+## 🔧 Requirements
 
-📌 [To be added] – A link to the paper or preprint will appear here once available.
+run:
 
-🔧 Requirements
-
-Coming soon: a list of dependencies and installation instructions.
+  ```bash
+    pip install -r requirements.txt
+   ```
