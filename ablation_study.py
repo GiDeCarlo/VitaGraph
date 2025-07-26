@@ -110,7 +110,7 @@ def get_model(model_name, dataset_version, task, in_channels_dict, num_nodes_per
   with open(models_params_path, 'r') as f:
     models_params = json.load(f)
   model_params = models_params[task][dataset_version][model_name]
-
+  print(f'[i] Model parameters: {model_params}')
   conv_hidden_channels = {f'layer_{x}':model_params[f'layer_{x}']  for x in range(model_params['conv_layer_num'])} 
 
   if model_name == 'rgcn':
@@ -236,6 +236,9 @@ def main(model_name, dataset_version, task, runs, epochs, patience, validation_s
     
     change_points = None
     if model_name == 'rgat':
+      _, indices = torch.sort(train_index[:, 1])  ### ordering the triples by relation for efficiency in conv loop
+      train_index = train_index[indices]  # reorder full triples by relation
+        
       rel_ids_sorted = train_index[:, 1]
       change_points = torch.cat([
           torch.tensor([0], device=device),
