@@ -10,7 +10,7 @@ for task in "${tasks[@]}"; do
   for dataset in "${datasets[@]}"; do
     for model in "${models[@]}"; do
       echo "🚀 Running > Task=$task | Dataset=$dataset | Model=$model"
-      python ablation_study.py -t "$task" -d "$dataset" -m "$model" --patience 10 --runs 2 --quiet
+      python ablation_study.py -t "$task" -d "$dataset" -m "$model" --patience 100 --runs 10 --quiet
       echo "✅ Completed"
     done
   done
