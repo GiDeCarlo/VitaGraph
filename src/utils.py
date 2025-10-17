@@ -13,8 +13,6 @@ from termcolor import colored
 import scipy.sparse as sparse
 from collections import defaultdict
 import rdkit.Chem.AllChem as AllChem
-import torch_geometric.transforms as T
-from torch_geometric.data import HeteroData
 from os.path import isfile, getsize, basename
 from sklearn.model_selection import train_test_split
 import torch
@@ -733,24 +731,6 @@ def load_data(edge_index_path, features_paths_per_type, quiet=True):
 
     return edge_ind, node_features
 
-def entities2id(edge_index, node_features_per_type):
-    # create a dictionary that maps the entities to an integer id
-    entities = set(edge_index["head"]).union(set(edge_index["tail"]))
-    entities2id = {}
-    all_nodes_per_type = {}
-    for x in entities:
-        if x.split("::")[0] not in all_nodes_per_type:
-            all_nodes_per_type[x.split("::")[0]] = [x]
-        else:
-            all_nodes_per_type[x.split("::")[0]].append(x)
-    for node_type, features in node_features_per_type.items():
-        if features is None:
-            for idx, node in enumerate(all_nodes_per_type[node_type]):
-                entities2id[node] = idx #+ offset
-            continue
-        for idx, node in enumerate(features.id):
-            entities2id[node] = idx #+ offset
-    return entities2id, all_nodes_per_type
 
 def entities2id_offset(edge_index, node_features_per_type, quiet=False):
     # create a dictionary that maps the entities to an integer id
@@ -784,13 +764,6 @@ def entities2id_offset(edge_index, node_features_per_type, quiet=False):
 
     return entities2id, all_nodes_per_type
 
-def rel2id(edge_index):
-    # create a dictionary that maps the relations to an integer id
-    rel2id = {rel.replace(" ","_"): idx for idx, rel in enumerate(edge_index.interaction.unique())}
-    relations = list(rel2id.keys())
-    for rel in relations:
-        rel2id[f"rev_{rel}"] = rel2id[rel] 
-    return rel2id
 
 def rel2id_offset(edge_index):
     # create a dictionary that maps the relations to an integer id
@@ -804,13 +777,6 @@ def rel2id_offset(edge_index):
     relation2id["self"] = rel_number*2 
     # print(relation2id)
     return relation2id
-
-def index_entities_edge_ind(edge_ind, entities2id):
-    # create a new edge index where the entities are replaced by their integer id
-    indexed_edge_ind = edge_ind.copy()
-    indexed_edge_ind["head"] = indexed_edge_ind["head"].apply(lambda x: entities2id[x])
-    indexed_edge_ind["tail"] = indexed_edge_ind["tail"].apply(lambda x: entities2id[x])
-    return indexed_edge_ind
 
 def edge_ind_to_id(edge_ind, entities2id, relation2id):
     # create a new edge index where the entities are replaced by their integer id
@@ -878,12 +844,6 @@ def triple_sampling(target_triplet, val_size, test_size, quiet=True, seed=42):
         print(f"\tTesting set shape: {len(test_data)}\n")
     return train_data, val_data, test_data
 
-def flat_index(triplets, num_nodes):
-    fr, to = triplets[:, 0]*num_nodes, triplets[:, 2]
-    offset = triplets[:, 1] * num_nodes*num_nodes 
-    flat_indices = fr + to + offset
-    return flat_indices
-
 def entities_features_flattening(node_features_per_type, all_nodes_per_type):
     # flatten the features of the entities
     flattened_features_per_type = {}
@@ -901,76 +861,6 @@ def entities_features_flattening(node_features_per_type, all_nodes_per_type):
 
     return flattened_features_per_type
 
-def create_hetero_data(indexed_edge_ind, node_features_per_type, rel2id, verbose=True):
-    data = HeteroData()
-    total_nodes = 0
-    for node_type, features in node_features_per_type.items():
-        data[f"{node_type}"].x = torch.tensor(features, dtype=torch.float).contiguous()
-        total_nodes += len(features)
-    all_interaction_per_type= indexed_edge_ind[["interaction","type"]].drop_duplicates().values
-    for interaction, entities in all_interaction_per_type:
-        edge_interaction = indexed_edge_ind.loc[(indexed_edge_ind["interaction"] == interaction) & (indexed_edge_ind["type"]==entities)]
-        entity_types = entities.split(" - ")  ######## "-" or " - " depending on the dataset
-        edges = edge_interaction.loc[:,["head","tail"]].values
-        data[entity_types[0].replace(" ",""),interaction.replace(" ","_"),entity_types[1].replace(" ","")].edge_index = torch.tensor(edges, dtype=torch.long).T.contiguous()
-
-    return data
-
-def data_split_and_negative_sampling( data, target_edges, rev_target, val_ratio=0.2, test_ratio=0.3 ,neg_sampling_ratio=1.0):
-    transform_split = T.RandomLinkSplit(
-        num_val=val_ratio,
-        num_test=test_ratio,
-        neg_sampling_ratio=neg_sampling_ratio,
-        add_negative_train_samples=True,
-        is_undirected=True,
-        edge_types=target_edges,
-        rev_edge_types=rev_target
-    )
-    return transform_split(data)
-
-def get_all_triplets(data, rel2id):    
-    head_tail = torch.cat(list(data.edge_index_dict.values()), dim=1)
-    # add the relation id to the triplets TO the last dimension
-    rel_ids = []
-    for edge_type in data.edge_types:
-        rel_ids.append(torch.tensor([rel2id[edge_type[1]] for _ in range(data[edge_type].edge_index.shape[1])]))
-    rel_ids = torch.cat(rel_ids, dim=0)
-    triplets = torch.cat([head_tail, rel_ids.view(1,-1)], dim=0)
-    triplets = triplets.T
-    # Swap the order of tail and interaction to get the triplets in the form (head, interaction, tail)
-    triplets[:,[1,2]] = triplets[:,[2,1]]
-    return triplets
-
-def get_target_triplets_and_labels(data, target_edges, relation2id):
-    all_target_triplets = []
-    all_labels = []
-
-    for target_edge in target_edges:
-
-        head_tail = data[target_edge].edge_label_index
-        rel_ids = torch.tensor([relation2id[target_edge[1]] for _ in range(head_tail.shape[1])])
-        # add the relation id to the triplets TO the last dimension
-
-        triplets = torch.cat([head_tail, rel_ids.view(1,-1)], dim=0)
-        triplets = triplets.T
-        # Swap the order of tail and interaction to get the triplets in the form (head, interaction, tail)
-        triplets[:,[1,2]] = triplets[:,[2,1]]
-        all_target_triplets.append(triplets)
-        all_labels.append(data[target_edge].edge_label)
-
-    all_target_triplets = torch.cat(all_target_triplets, dim=0)
-    all_labels = torch.cat(all_labels, dim=0)
-    
-    return all_target_triplets, all_labels
-
-def graph_transform(data):
-    transformation = []
-    transformation.append(T.ToUndirected())
-    transformation.append(T.AddSelfLoops())
-    transformation.append(T.RemoveDuplicatedEdges()) # Always remove duplicated edges
-    transform = T.Compose(transformation)
-    data = transform(data)
-    return data
                       
 def evaluation_metrics(model, embeddings, all_target_triplets, test_triplet, num_generate, device, hits=[1,3,10]):
     src, _, dst = all_target_triplets.T

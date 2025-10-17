@@ -39,21 +39,16 @@ def get_dataset(dataset_version, task, validation_size, test_size, quiet, seed):
 
   features_paths = {}
   if dataset_version == 'vitagraph':
-    edge_index_path = './dataset/vitagraph/vitagraph.tsv'
+    edge_index_path = './datasets/vitagraph.tsv'
     features_paths = {
-      'Gene': './dataset/vitagraph/gene_features.csv',
-      'Compound': './dataset/vitagraph/cmp_features.csv'
+      'Gene': './datasets/vitagraph_features/gene_features.csv',
+      'Compound': './datasets/vitagraph_features/cmp_features.csv'
     }
   elif dataset_version == 'vitagraph_no_features':
-    edge_index_path = './dataset/vitagraph_no_features/vitagraph_no_features.tsv'
+    edge_index_path = './datasets/vitagraph_no_features/vitagraph_no_features.tsv'
   elif dataset_version == 'drkg':
-    edge_index_path = './dataset/drkg/drkg.tsv'
+    edge_index_path = './datasets/drkg/drkg.tsv'
   
-  # features_paths = {
-  #   'Gene': gene_features_path,
-  #   'Compound': compound_features_path
-  # }
-
   edge_index, node_features_per_type = load_data(
     edge_index_path,
     features_paths,
