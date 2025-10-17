@@ -5,10 +5,10 @@ import pandas as pd
 from os.path import isfile
 from termcolor import colored
 from time import perf_counter
-from src.utils import extract_largest_connected_component, check_file, set_seeds, \
+from src.utils import extract_largest_connected_component, check_file, set_seed, \
 	read_yaml_config, read_drkg_df, stats, standardization, parse_args
 
-set_seeds()
+set_seed()
 
 #*---------------------------------------------------------------------*
 #|Restructure the interaction column in the DRKG 					 
@@ -568,7 +568,9 @@ def add_genes_features_from_entity(in_fname, entity_type, in_features_file, out_
 	# Save Entity to id dictionary to save the position in the feature vector relative to the entity #
 	##################################################################################################
 
-	fname = f'Dataset/generated/{entity_type}_feature_vector_position_dict.json'
+	path_feature = os.path.split(out_features_file)
+
+	fname = os.path.join(path_feature[0], f'{entity_type}_feature_vector_position_dict.json')
 
 	with open(fname, 'w') as fout:
 		json.dump(entity_to_id, fout)

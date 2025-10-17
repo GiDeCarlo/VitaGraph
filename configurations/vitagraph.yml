@@ -2,96 +2,96 @@ overwrite: True
 
 interaction_restructure:
   do: True 
-  in_fname: 'Dataset/drkg.tsv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  in_fname: './datasets/drkg.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 remove_hetionet_pathways:
   do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 merge_datasets:
   do: True
-  dataset: 'Dataset/vitagraph.tsv'
+  dataset: './output/vitagraph.tsv'
   to_add:
-    - 'Dataset/auxiliary/reactome.csv'
-    - 'Dataset/auxiliary/onsides.csv'
-  out_fname: 'Dataset/vitagraph.tsv'
+    - './datasets/auxiliary/reactome.csv'
+    - './datasets/auxiliary/onsides.csv'
+  out_fname: './output/vitagraph.tsv'
 
 translate_ids:
   do: True
-  in_fname: 'Dataset/vitagraph.tsv'
-  translation_dataset: 'Dataset/auxiliary/drugbank_to_ncbi_gene_id.csv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  in_fname: './output/vitagraph.tsv'
+  translation_dataset: './datasets/auxiliary/drugbank_to_ncbi_gene_id.csv'
+  out_fname: './output/vitagraph.tsv'
 
 map_compounds_ids:
   do: True
-  in_fname: 'Dataset/vitagraph.tsv'
-  mapping_fname: 'Dataset/auxiliary/compounds_mapping.csv'
+  in_fname: './output/vitagraph.tsv'
+  mapping_fname: './datasets/auxiliary/compounds_mapping.csv'
   map_to_db: 'PubChem Compounds'
-  out_fname: 'Dataset/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 map_diseases_ids:
   do: True
-  in_fname: 'Dataset/vitagraph.tsv'
-  mapping_fname: 'Dataset/auxiliary/disease_mapping.csv'
+  in_fname: './output/vitagraph.tsv'
+  mapping_fname: './datasets/auxiliary/disease_mapping.csv'
   map_to_db: 'DOID'
-  out_fname: 'Dataset/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 remove_triplets_with_semicolon:
   do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  out_fname: 'Dataset/vitagraph.tsv' 
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv' 
 
 remove_triplets_with_pipe:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 relation_standardization:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv' 
-  out_fname: 'Dataset/vitagraph.tsv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 remove_non_human_genes:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  non_human_genes_fname: 'Dataset/auxiliary/genes_to_remove.csv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  non_human_genes_fname: './datasets/auxiliary/genes_to_remove.csv'
+  out_fname: './output/vitagraph.tsv'
 
 remove_compunds_without_smiles:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  compound_smiles_fname: 'Dataset/auxiliary/all_cmp_info.csv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  compound_smiles_fname: './datasets/auxiliary/all_cmp_info.csv'
+  out_fname: './output/vitagraph.tsv'
 
 add_genes_features_from_pathways:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv' 
-  in_features_file: 'Dataset/generated/gene_features.csv'
-  out_features_file: 'Dataset/generated/gene_features.csv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  in_features_file: './datasets/output/gene_features.csv'
+  out_features_file: './datasets/output/gene_features.csv'
 
 add_genes_features_from_molecular_functions:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv' 
-  in_features_file: 'Dataset/generated/gene_features.csv'
-  out_features_file: 'Dataset/generated/gene_features.csv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  in_features_file: './datasets/output/gene_features.csv'
+  out_features_file: './datasets/output/gene_features.csv'
 
 add_genes_features_from_cellular_components:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv' 
-  in_features_file: 'Dataset/generated/gene_features.csv'
-  out_features_file: 'Dataset/generated/gene_features.csv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  in_features_file: './datasets/output/gene_features.csv'
+  out_features_file: './datasets/output/gene_features.csv'
 
 add_genes_features_from_biological_processes:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv' 
-  in_features_file: 'Dataset/generated/gene_features.csv'
-  out_features_file: 'Dataset/generated/gene_features.csv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
+  in_features_file: './datasets/output/gene_features.csv'
+  out_features_file: './datasets/output/gene_features.csv'
 
 remove_entity_nodes:
-  do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
+  do: True
+  in_fname: './output/vitagraph.tsv'
   to_remove: 
     entity: 
     - 'Pathway'
@@ -101,20 +101,20 @@ remove_entity_nodes:
     - 'Atc'
     - 'PharmacologicClass'
 
-  out_fname: 'Dataset/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 drop_duplicates:
   do: True 
-  in_fname: 'Dataset/vitagraph.tsv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
 
 extract_lcc:
   do: True
-  in_fname: 'Dataset/vitagraph.tsv'
-  out_fname: 'Dataset/vitagraph.tsv'
+  in_fname: './output/vitagraph.tsv'
+  out_fname: './output/vitagraph.tsv'
   debug: False  # Set to False to disable debug messages
 
 stats:
   do: True
-  start_file: 'Dataset/drkg.tsv'
-  end_file: 'Dataset/vitagraph.tsv'
+  start_file: './datasets/drkg.tsv'
+  end_file: './output/vitagraph.tsv'
